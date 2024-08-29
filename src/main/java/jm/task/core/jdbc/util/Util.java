@@ -1,28 +1,22 @@
 package jm.task.core.jdbc.util;
 import java.sql.*;
-import java.sql.Driver;
 
 public class Util {
-    private static final String URL = "jdbc:mysql://localhost:3306/kata_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = "12TSsKt@";
+    private static String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static String DB_URL = "jdbc:mysql://localhost:3306/kata_db";
+    private static String USER = "root";
+    private static String PASS = "12TSsKt@";
 
     public static Connection getConnection() {
-        Connection connection = null;
         try {
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Create the connection
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            if (!connection.isClosed()) {
-                System.out.println("Connection successful!");
-            }
-            connection.close();
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Connection failed!");
+            Class.forName(DB_DRIVER);
+            return DriverManager.getConnection(DB_URL, USER, PASS);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("DB Driver not found", e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect to the database", e);
         }
-
-        return connection;
     }
 }
+
+
