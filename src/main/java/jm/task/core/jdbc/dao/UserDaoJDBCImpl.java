@@ -1,6 +1,5 @@
 package jm.task.core.jdbc.dao;
 
-import com.mysql.cj.jdbc.StatementImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
@@ -8,10 +7,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import static java.sql.DriverManager.getConnection;
 
 public class UserDaoJDBCImpl implements UserDao {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserDaoJDBCImpl.class);
     public UserDaoJDBCImpl() {
 
     }
@@ -28,9 +31,9 @@ public class UserDaoJDBCImpl implements UserDao {
                     + "PRIMARY KEY (`id`))";
 
             stmt.executeUpdate(sql);
-            System.out.println("Created table in given database...");
+            logger.info("Created table in given database...");
         } catch (SQLException e) {
-            System.out.println("Error occurred while trying to create the table");
+            logger.error("Failed to create table in given database.", e);
         }
     }
 
@@ -40,9 +43,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection conn = Util.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
              preparedStatement.executeUpdate();
-             System.out.println("Table dropped successfully.");
+             logger.info("Dropped table in given database...");
         } catch (SQLException e) {
-            System.out.println("Error occurred while trying to drop the table");
+            logger.error("Failed to drop table in given database.", e);
         }
     }
 
@@ -55,9 +58,9 @@ public class UserDaoJDBCImpl implements UserDao {
              preparedStatement.setString(2, lastName);
              preparedStatement.setByte(3, (byte) age);
              preparedStatement.executeUpdate();
-             System.out.println("User added successfully. User with name '" + name + "' added to the database.");
+             logger.info("User added successfully. User with name '" + name + "' added to the database");
         } catch (SQLException e) {
-            System.out.println("Error occurred while trying to add user");
+            logger.error("Error occurred while trying to add user");
         }
     }
 
@@ -68,13 +71,13 @@ public class UserDaoJDBCImpl implements UserDao {
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
              int resultOutput = preparedStatement.executeUpdate();
              if (resultOutput == 0) {
-                 System.out.println("User with id " + id + " not found.");
+                 logger.info("User with id '" + id + "' was not found in the database");
              }
              else {
-                 System.out.println("User with id " + id + " has been removed successfully.");
+                 logger.info("User with id '" + id + "' was found in the database");
              }
         } catch (SQLException e) {
-            System.out.println("Error occurred while trying to remove user");
+            logger.error("Error occurred while trying to remove user with id '" + id + "'", e);
         }
     }
 
@@ -95,10 +98,10 @@ public class UserDaoJDBCImpl implements UserDao {
                     users.add(user);
                 }
             } else {
-                System.out.println("No users found in the table.");
+                logger.info("No users were found in the database");
             }
         } catch (SQLException e) {
-            System.out.println("Error retrieving user list, there was a problem fetching data from the database.");
+            logger.error("Error occurred while trying to get all users", e);
             throw new RuntimeException(e);
         }
         return users;
@@ -110,9 +113,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection conn = Util.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
              preparedStatement.executeUpdate();
-            System.out.println("Table cleared successfully.....");
+             logger.info("Cleaned up table in given database...");
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failed to clean table in given database.", e);
         }
     }
 }
