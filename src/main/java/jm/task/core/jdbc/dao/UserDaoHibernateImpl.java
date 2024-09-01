@@ -45,7 +45,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Query query = session.createSQLQuery("DROP TABLE `kata_db`.`users`");
+            Query query = session.createSQLQuery("DROP TABLE IF EXISTS users");
             query.executeUpdate();
             transaction.commit();
             logger.info("Table 'users' successfully dropped.");
@@ -55,7 +55,6 @@ public class UserDaoHibernateImpl implements UserDao {
             }
             logger.error("Error while dropping 'users' table: {}", e.getMessage(), e);
         }
-
     }
 
     @Override
@@ -97,7 +96,7 @@ public class UserDaoHibernateImpl implements UserDao {
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            users = session.createQuery("SELECT * FROM users").list();
+            users = session.createQuery("FROM User", User.class).list();
             session.getTransaction().commit();
             logger.info("Successfully retrieved all users.");
         } catch (Exception e) {
@@ -105,7 +104,6 @@ public class UserDaoHibernateImpl implements UserDao {
                 transaction.rollback();
             }
             logger.error("Error while retrieving all users: {}", e.getMessage(), e);
-
         }
         return users;
     }
