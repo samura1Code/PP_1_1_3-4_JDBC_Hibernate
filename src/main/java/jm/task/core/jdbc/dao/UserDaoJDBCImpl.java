@@ -23,7 +23,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void createUsersTable() {
         try (Connection conn = Util.getConnection();
              Statement stmt = conn.createStatement()) {
-            String sql = "CREATE TABLE IF NOT EXISTS `users` ("
+             String sql = "CREATE TABLE IF NOT EXISTS `kata_db`.`users`("
                     + "`id` BIGINT NOT NULL AUTO_INCREMENT, "
                     + "`name` VARCHAR(45) NOT NULL, "
                     + "`lastname` VARCHAR(45) NOT NULL, "
@@ -51,7 +51,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO users (NAME, LASTNAME, AGE) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO `kata_db`.`users` (NAME, LASTNAME, AGE) VALUES(?, ?, ?)";
         try (Connection conn = Util.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
              preparedStatement.setString(1, name);
@@ -66,9 +66,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-        String sql = "DELETE fROM users where id = '" + id + "'";
+        String sql = "DELETE FROM `kata_db`.`users` WHERE id = ?";
         try (Connection conn = Util.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+             preparedStatement.setLong(1, id);
              int resultOutput = preparedStatement.executeUpdate();
              if (resultOutput == 0) {
                  logger.info("User with id '" + id + "' was not found in the database");
@@ -84,7 +85,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String SQL = "SELECT * FROM users";
+        String SQL = "SELECT * FROM `kata_db`.`users`";
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SQL);) {
